@@ -65,13 +65,12 @@ router.route("/users/:id")
     });
   });
 
-function addAdditionalParamsForAccessTokenGen(response) {
+function addAdditionalParamsForAccessTokenGen(response, isLoggedIn) {
   response['deviceId'] = deviceId;
   response['deviceType'] = deviceType;
-  response['isLoggedIn'] = 1;
+  response['isLoggedIn'] = isLoggedIn;
   response['isRevoked'] = isRevoked;
   response['ipAddress'] = ipAddress;
-  //response['issuedAt'] = issuedAt;
   return response;
 }
 
@@ -87,7 +86,7 @@ router.route("/access_token/:id")
       }
       console.log('User data retrieved from DB:\n');
       console.log(response);
-      response = addAdditionalParamsForAccessTokenGen(response);
+      response = addAdditionalParamsForAccessTokenGen(response, 1);
       refreshTokenPayload = generatePayloadForRefreshTokenGen(response, 0);
       console.log('User data retrieved from DB and additional data added:\n');
       console.log(response);
@@ -149,7 +148,7 @@ router.route("/refresh_token")
             } else {
               response = data.toObject();
             }
-            response = addAdditionalParamsForAccessTokenGen(response);
+            response = addAdditionalParamsForAccessTokenGen(response, 1);
             signAndEncrypt(response, 'access_token')
               .then(actoken => {
                 return res.json({
@@ -223,6 +222,47 @@ router.route("/revoke_refresh_token")
         return res.json({
           error: true,
           message: 'Something went wrong while verifying the refresh token: ' + error.message
+        })
+      })
+  });
+
+//Find out how its usuall done.
+//For now, just set the isLoggedIn flag to false in the access token
+router.route("/logout")
+  .post(function (req, res) {
+    let response = {};
+    let accessToken = req.body.accessToken;
+    decryptAndVerify(accessToken)
+      .then(validatedRes => {
+        if (validatedRes.isValid) {
+          if(validatedRes.nakedToken.isLoggedIn === 0) {
+            return res.json({
+              error: true,
+              message: 'Already logged out. Why try again?'
+            });
+          }
+          response = addAdditionalParamsForAccessTokenGen(accessToken, 0);
+          signAndEncrypt(response, 'access_token')
+            .then(actoken => {
+                return res.json({
+                  'access_token': actoken
+                })
+              }
+            )
+            .catch(error => {
+              return res.json({
+                error: true,
+                message: 'Something went wrong while logging out of access token: ' + error.message
+              })
+            });
+        } else {
+          return res.json({error: true, message: 'Incorrect/Invalid access token.'});
+        }
+      })
+      .catch(error => {
+        return res.json({
+          error: true,
+          message: 'Something went wrong while verifying the access token: ' + error.message
         })
       })
   });
