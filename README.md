@@ -1,1 +1,1 @@
-Just `npm start` it!
+First `npm install` and then just ``npm start` it!
