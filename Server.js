@@ -88,7 +88,7 @@ router.route("/access_token/:id")
       console.log('User data retrieved from DB:\n');
       console.log(response);
       response = addAdditionalParamsForAccessTokenGen(response);
-      refreshTokenPayload = generatePayloadForRefreshTokenGen(response, false);
+      refreshTokenPayload = generatePayloadForRefreshTokenGen(response, 0);
       console.log('User data retrieved from DB and additional data added:\n');
       console.log(response);
       signAndEncrypt(response, 'access_token')
@@ -149,7 +149,7 @@ router.route("/refresh_token")
             } else {
               response = data.toObject();
             }
-            refreshTokenPayload = generatePayloadForRefreshTokenGen(response, true);
+            response = addAdditionalParamsForAccessTokenGen(response);
             signAndEncrypt(response, 'access_token')
               .then(actoken => {
                 return res.json({
@@ -161,12 +161,12 @@ router.route("/refresh_token")
               .catch(error => {
                 return res.json({
                   error: true,
-                  message: 'Something went wrong while revoking refreshing token: ' + error.message
+                  message: 'Something went wrong while refreshing access token: ' + error.message
                 })
               })
           });
         } else {
-          return res.json({error: true, message: 'Incorrect/Invalid refresh token. So, never mind!'});
+          return res.json({error: true, message: 'Incorrect/Invalid refresh token'});
         }
       })
       .catch(error => {
@@ -200,24 +200,23 @@ router.route("/revoke_refresh_token")
             } else {
               response = data.toObject();
             }
-            response = addAdditionalParamsForAccessTokenGen(response);
-            signAndEncrypt(response, 'access_token')
-              .then(actoken => {
+            response = generatePayloadForRefreshTokenGen(response, 1);
+            signAndEncrypt(response, 'refresh_token')
+              .then(rftoken => {
                   return res.json({
-                    'access_token': actoken,
-                    'refresh_token': refreshToken
+                    'refresh_token': rftoken
                   })
                 }
               )
               .catch(error => {
                 return res.json({
                   error: true,
-                  message: 'Something went wrong while refreshing token: ' + error.message
+                  message: 'Something went wrong while revoking refreshing token: ' + error.message
                 })
               })
           });
         } else {
-          return res.json({error: true, message: 'Incorrect/Invalid refresh token'});
+          return res.json({error: true, message: 'Incorrect/Invalid refresh token. So, never mind!'});
         }
       })
       .catch(error => {
