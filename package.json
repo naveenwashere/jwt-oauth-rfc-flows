@@ -1,0 +1,24 @@
+{
+  "name": "nodeMongo",
+  "version": "1.0.0",
+  "description": "Authentiction Service POC for JWTs",
+  "main": "Server.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [
+    "Node.js",
+    "mongoDb"
+  ],
+  "dependencies": {
+    "body-parser": "^1.13.3",
+    "express": "^4.13.3",
+    "mongoose": "^4.1.2",
+    "jsonwebtoken": "~7.2.1",
+    "atob": "~2.0.3",
+    "node-jose": "~0.9.2",
+    "fs": "^0.0.1-security",
+    "babel-cli": "^6.18.0",
+    "babel-preset-latest": "^6.16.0"
+  }
+}
