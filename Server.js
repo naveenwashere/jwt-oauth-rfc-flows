@@ -13,8 +13,6 @@ const isRevoked = 0; //default 0 unless specified by blaclist
 const deviceType = 'Mobile'; //to be collected by FE
 const ipAddress = '192.168.1.1'; //to be collected by FE
 
-const issuedAt = new Date().getTime() / 1000;
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({"extended": false}));
 
