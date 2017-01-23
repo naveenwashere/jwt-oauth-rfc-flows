@@ -1,7 +1,7 @@
-let fs = require('fs');
-let atob = require('atob');
-let jose = require('node-jose');
-let jwt = require('jsonwebtoken');
+const fs = require('fs');
+const atob = require('atob');
+const jose = require('node-jose');
+const jwt = require('jsonwebtoken');
 
 const newline = '\n';
 

@@ -1,7 +1,7 @@
-var express = require('express');
-var bodyParser = require('body-parser');
-var mongoOp = require('./models/mongo');
-var {signAndEncrypt, decryptAndVerify} = require('./services/jwt.service');
+const express = require('express');
+const bodyParser = require('body-parser');
+const mongoOp = require('./models/mongo');
+const {signAndEncrypt, decryptAndVerify} = require('./services/jwt.service');
 
 const app = express();
 const router = express.Router();
