@@ -232,7 +232,7 @@ router.route("/logout")
   .post(function (req, res) {
     let response = {};
     let accessToken = req.body.accessToken;
-    decryptAndVerify(accessToken)
+    decryptAndVerify(accessToken, 'access_token')
       .then(validatedRes => {
         if (validatedRes.isValid) {
           if(validatedRes.nakedToken.isLoggedIn === 0) {
@@ -241,7 +241,7 @@ router.route("/logout")
               message: 'Already logged out. Why try again?'
             });
           }
-          response = addAdditionalParamsForAccessTokenGen(accessToken, 0);
+          response = addAdditionalParamsForAccessTokenGen(validatedRes.nakedToken, 0);
           signAndEncrypt(response, 'access_token')
             .then(actoken => {
                 return res.json({

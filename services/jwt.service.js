@@ -5,9 +5,9 @@ let jwt = require('jsonwebtoken');
 
 const newline = '\n';
 
-const accesTokenHeaders = {
+const accessTokenHeaders = {
   algorithm: 'RS256',
-  expiresIn: 60 * 15 //Token expiry set to 15 mins
+  expiresIn: 900 //Token expiry set to 15 mins
 };
 
 const refreshTokenHeaders = {
@@ -69,7 +69,10 @@ const sign = (payload, tokenType) => {
   payload['issuedAt'] = new Date().getTime() / 1000;
   console.log('Payload attributes added: ' + JSON.stringify(payload) + newline);
   if (tokenType === 'access_token') {
-    return jwt.sign(payload, privateSignKey, accesTokenHeaders);
+    if(payload['exp'] !== null) {
+      delete payload.exp;
+    }
+    return jwt.sign(payload, privateSignKey, accessTokenHeaders);
   }
   return jwt.sign(payload, privateSignKey, refreshTokenHeaders);
 };
@@ -87,18 +90,21 @@ function encrypt(key, plaintext) {
     });
 }
 
-function signAndEncrypt(payload) {
-  const jwtoken = sign(payload);
+function signAndEncrypt(payload, tokenType) {
+  const jwtoken = sign(payload, tokenType);
   return encrypt(encKeystore.toJSON().keys[0], JSON.stringify(jwtoken));
 }
 
 const verify = (decrypted, tokenType) => {
   return new Promise((resolve, reject) => {
-    jwt.verify(decrypted.replace(/"/g, ''), publicSignKey.key, tokenType === 'access_token' ? accesTokenHeaders : refreshTokenHeaders, function (err, decoded) {
+    console.log('Headers selected for verifiation:\n');
+    console.log(tokenType === 'access_token' ? accessTokenHeaders : refreshTokenHeaders);
+    jwt.verify(decrypted.replace(/"/g, ''), publicSignKey.key, tokenType === 'access_token' ? accessTokenHeaders : refreshTokenHeaders, function (err, decoded) {
       if (err != null) {
         console.log('Error verifying the token signature: ', err.name, err.message);
         reject(err.name + ' - ' + err.msg);
       }
+      console.log('Decoded: \n')
       console.log(decoded);
       resolve({
         isValid: true,
