@@ -4,4 +4,4 @@ steps:
 images:
 - 'gcr.io/$PROJECT_ID/rfc-flows-image'
 - name: 'gcr.io/cloud-builders/docker'
-  args: [ 'run', 'gcr.io/$PROJECT_ID/rfc-flows-image', '.' ]
+  args: [ 'run', 'gcr.io/$PROJECT_ID/rfc-flows-image' ]
